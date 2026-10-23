@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { apiClient } from "@/lib/api-client";
 import { formatBDT } from "@/lib/money";
 import { authClient } from "@/lib/auth-client";
+import ImagePicker from "@/components/ImagePicker";
 import {
   Package,
   Plus,
@@ -33,6 +34,7 @@ export default function ProductsPage() {
     sellingPriceBDT: "",
     stockQuantity: "0",
     lowStockThreshold: "10",
+    imageUrl: "",
   });
   const [formError, setFormError] = useState("");
   const [isSaving, setIsSaving] = useState(false);
@@ -99,6 +101,7 @@ export default function ProductsPage() {
         sellingPrice: Math.round(priceBDT * 100), // convert to minor units
         stockQuantity: parseInt(formData.stockQuantity, 10) || 0,
         lowStockThreshold: parseInt(formData.lowStockThreshold, 10) || 10,
+        imageUrl: formData.imageUrl ? formData.imageUrl.trim() : null,
         isActive: true,
       };
 
@@ -116,6 +119,7 @@ export default function ProductsPage() {
           sellingPriceBDT: "",
           stockQuantity: "0",
           lowStockThreshold: "10",
+          imageUrl: "",
         });
         fetchProducts(1);
       }
@@ -209,7 +213,25 @@ export default function ProductsPage() {
                   return (
                     <tr key={product._id} className="hover:bg-slate-900/40 transition-colors">
                       <td className="py-4 px-6 font-bold text-white">
-                        {product.name}
+                        <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 shrink-0 overflow-hidden rounded-xl border border-slate-800 bg-slate-900 flex items-center justify-center">
+                            {product.imageUrl ? (
+                              <img
+                                src={product.imageUrl}
+                                alt={product.name}
+                                className="h-full w-full object-cover"
+                                onError={(e) => {
+                                  e.target.style.display = "none";
+                                }}
+                              />
+                            ) : (
+                              <Package className="h-5 w-5 text-slate-600" />
+                            )}
+                          </div>
+                          <div>
+                            <span className="font-bold text-white block">{product.name}</span>
+                          </div>
+                        </div>
                       </td>
                       <td className="py-4 px-4 font-mono text-slate-300">
                         {product.sku}
@@ -307,6 +329,11 @@ export default function ProductsPage() {
             )}
 
             <form onSubmit={handleCreateProduct} className="mt-4 space-y-4">
+              <ImagePicker
+                value={formData.imageUrl}
+                onChange={(url) => setFormData({ ...formData, imageUrl: url })}
+              />
+
               <div>
                 <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-300">
                   Product Name *

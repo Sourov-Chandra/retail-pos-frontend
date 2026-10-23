@@ -242,39 +242,56 @@ export default function POSTerminalPage() {
                     key={product._id}
                     onClick={() => addToCart(product)}
                     disabled={isOutOfStock}
-                    className={`group relative flex flex-col justify-between overflow-hidden rounded-2xl border p-4 text-left transition-all ${
+                    className={`group relative flex flex-col justify-between overflow-hidden rounded-2xl border p-3 text-left transition-all ${
                       isOutOfStock
                         ? "border-slate-800/40 bg-slate-900/20 opacity-50 cursor-not-allowed"
                         : "border-slate-800/80 bg-slate-900/50 hover:border-brand-500/50 hover:bg-slate-900 hover:shadow-xl hover:shadow-brand-500/5 active:scale-[0.98]"
                     }`}
                   >
                     <div>
-                      <div className="flex items-center justify-between">
-                        <span className="rounded-md bg-slate-800 px-2 py-0.5 text-[10px] font-semibold text-slate-400 font-mono">
-                          {product.sku}
-                        </span>
-                        {isOutOfStock ? (
-                          <span className="rounded-full bg-rose-500/20 px-2 py-0.5 text-[10px] font-semibold text-rose-400">
-                            Out
-                          </span>
-                        ) : isLowStock ? (
-                          <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] font-semibold text-amber-400 animate-pulse">
-                            {product.stockQuantity} left
-                          </span>
+                      {/* Product Image Thumbnail */}
+                      <div className="relative mb-3 aspect-[4/3] w-full overflow-hidden rounded-xl bg-slate-950/60 border border-slate-800 flex items-center justify-center">
+                        {product.imageUrl ? (
+                          <img
+                            src={product.imageUrl}
+                            alt={product.name}
+                            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                            onError={(e) => {
+                              e.target.style.display = "none";
+                            }}
+                          />
                         ) : (
-                          <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-semibold text-emerald-400">
-                            {product.stockQuantity} in stock
-                          </span>
+                          <Package className="h-8 w-8 text-slate-700" />
                         )}
+                        <div className="absolute top-2 left-2">
+                          <span className="rounded-md bg-slate-950/85 backdrop-blur-md px-2 py-0.5 text-[10px] font-semibold text-slate-300 font-mono">
+                            {product.sku}
+                          </span>
+                        </div>
+                        <div className="absolute top-2 right-2">
+                          {isOutOfStock ? (
+                            <span className="rounded-full bg-rose-500/90 px-2 py-0.5 text-[10px] font-bold text-white shadow-sm">
+                              Out
+                            </span>
+                          ) : isLowStock ? (
+                            <span className="rounded-full bg-amber-500/90 px-2 py-0.5 text-[10px] font-bold text-slate-950 shadow-sm animate-pulse">
+                              {product.stockQuantity} left
+                            </span>
+                          ) : (
+                            <span className="rounded-full bg-emerald-500/90 px-2 py-0.5 text-[10px] font-bold text-white shadow-sm">
+                              {product.stockQuantity}
+                            </span>
+                          )}
+                        </div>
                       </div>
 
-                      <h3 className="mt-3 line-clamp-2 text-sm font-bold text-white group-hover:text-brand-300">
+                      <h3 className="line-clamp-1 text-sm font-bold text-white group-hover:text-brand-300">
                         {product.name}
                       </h3>
-                      <p className="mt-1 text-xs text-slate-400">{product.category}</p>
+                      <p className="mt-0.5 text-xs text-slate-400">{product.category}</p>
                     </div>
 
-                    <div className="mt-4 flex items-center justify-between border-t border-slate-800/60 pt-3">
+                    <div className="mt-3 flex items-center justify-between border-t border-slate-800/60 pt-2.5">
                       <span className="text-base font-black text-emerald-400 font-mono">
                         {formatBDT(product.sellingPrice)}
                       </span>
