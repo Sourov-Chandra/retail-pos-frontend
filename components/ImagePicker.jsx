@@ -60,14 +60,21 @@ export default function ImagePicker({ value, onChange }) {
         credentials: "include",
       });
 
-      const data = await response.json();
+      const data = await response.json().catch(() => null);
       if (!response.ok) {
-        throw new Error(data.error?.message || "Failed to upload image.");
+        throw new Error(data?.error?.message || `Upload failed with status ${response.status}`);
       }
 
       onChange(data.url);
     } catch (err) {
-      alert(err.message || "Upload error");
+      console.error("Upload error:", err);
+      if (err.name === "TypeError" && err.message.includes("fetch")) {
+        alert(
+          "Cannot connect to the backend server.\n\nPlease make sure your backend is running on http://localhost:5000 (cd server && npm run dev)."
+        );
+      } else {
+        alert(err.message || "Failed to upload image.");
+      }
     } finally {
       setIsUploading(false);
     }
@@ -196,7 +203,7 @@ export default function ImagePicker({ value, onChange }) {
               <input
                 ref={fileInputRef}
                 type="file"
-                accept="image/*"
+                accept="image/*,.avif,.webp,.png,.jpg,.jpeg,.gif"
                 onChange={handleFileChange}
                 className="hidden"
               />
@@ -212,7 +219,7 @@ export default function ImagePicker({ value, onChange }) {
                   <>
                     <Upload className="h-6 w-6 text-brand-400" />
                     <span>Choose an image from your computer</span>
-                    <span className="text-[10px] text-slate-500">PNG, JPG, WebP up to 10MB</span>
+                    <span className="text-[10px] text-slate-500">AVIF, WebP, PNG, JPG, GIF up to 15MB</span>
                   </>
                 )}
               </button>
