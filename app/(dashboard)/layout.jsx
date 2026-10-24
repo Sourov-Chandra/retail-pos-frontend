@@ -57,21 +57,37 @@ export default function DashboardLayout({ children }) {
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
+
     async function fetchSession() {
       try {
-        const session = await authClient.getSession();
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("Session check timeout")), 2500)
+        );
+
+        const session = await Promise.race([
+          authClient.getSession(),
+          timeoutPromise,
+        ]);
+
+        if (!isMounted) return;
+
         if (!session || !session.data) {
           router.replace("/login");
           return;
         }
         setCurrentUser(session.data.user);
       } catch {
-        router.replace("/login");
+        if (isMounted) router.replace("/login");
       } finally {
-        setIsLoadingAuth(false);
+        if (isMounted) setIsLoadingAuth(false);
       }
     }
     fetchSession();
+
+    return () => {
+      isMounted = false;
+    };
   }, [router]);
 
   const handleSignOut = async () => {
