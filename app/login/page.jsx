@@ -32,7 +32,7 @@ export default function LoginPage() {
       if (res.error) {
         setErrorMsg(res.error.message || "Invalid credentials. Please verify and try again.");
       } else {
-        router.push("/dashboard");
+        window.location.href = "/dashboard";
       }
     } catch (err) {
       setErrorMsg(err.message || "Failed to sign in. Please verify your connection.");

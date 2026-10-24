@@ -73,12 +73,12 @@ export default function DashboardLayout({ children }) {
         if (!isMounted) return;
 
         if (!session || !session.data) {
-          router.replace("/login");
+          window.location.replace("/login");
           return;
         }
         setCurrentUser(session.data.user);
       } catch {
-        if (isMounted) router.replace("/login");
+        if (isMounted) window.location.replace("/login");
       } finally {
         if (isMounted) setIsLoadingAuth(false);
       }
