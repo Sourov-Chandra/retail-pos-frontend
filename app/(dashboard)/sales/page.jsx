@@ -62,8 +62,8 @@ export default function SalesHistoryPage() {
       {/* Header */}
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-extrabold text-white sm:text-3xl">Sales History</h1>
-          <p className="mt-1 text-xs text-slate-400">
+          <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white sm:text-3xl">Sales History</h1>
+          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
             View completed transactions, reprint receipts, and track audit records.
           </p>
         </div>
@@ -73,31 +73,31 @@ export default function SalesHistoryPage() {
       <div className="glass-panel rounded-2xl p-4">
         <form onSubmit={handleFilterSubmit} className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-slate-400">From:</span>
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">From:</span>
             <input
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="rounded-xl border border-slate-800 bg-slate-900 py-1.5 px-3 text-xs text-white focus:border-brand-500 focus:outline-none"
+              className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-1.5 px-3 text-xs text-slate-900 dark:text-white focus:border-brand-500 focus:outline-none shadow-sm"
             />
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-slate-400">To:</span>
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">To:</span>
             <input
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="rounded-xl border border-slate-800 bg-slate-900 py-1.5 px-3 text-xs text-white focus:border-brand-500 focus:outline-none"
+              className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-1.5 px-3 text-xs text-slate-900 dark:text-white focus:border-brand-500 focus:outline-none shadow-sm"
             />
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-slate-400">Payment:</span>
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Payment:</span>
             <select
               value={paymentMethod}
               onChange={(e) => setPaymentMethod(e.target.value)}
-              className="rounded-xl border border-slate-800 bg-slate-900 py-1.5 px-3 text-xs text-white focus:border-brand-500 focus:outline-none"
+              className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-1.5 px-3 text-xs text-slate-900 dark:text-white focus:border-brand-500 focus:outline-none shadow-sm"
             >
               <option value="">All Methods</option>
               <option value="cash">Cash</option>
@@ -108,7 +108,7 @@ export default function SalesHistoryPage() {
 
           <button
             type="submit"
-            className="rounded-xl bg-brand-600 px-4 py-2 text-xs font-bold text-white hover:bg-brand-500 transition-colors"
+            className="rounded-xl bg-brand-600 px-4 py-2 text-xs font-bold text-white hover:bg-brand-500 transition-colors shadow-sm"
           >
             Filter
           </button>
@@ -119,7 +119,7 @@ export default function SalesHistoryPage() {
       <div className="glass-panel overflow-hidden rounded-3xl">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="border-b border-slate-800/80 bg-slate-900/60 uppercase tracking-wider text-slate-400 font-semibold">
+            <thead className="border-b border-slate-200 dark:border-slate-800/80 bg-slate-100/70 dark:bg-slate-900/60 uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">
               <tr>
                 <th className="py-4 px-6">Receipt / Sale #</th>
                 <th className="py-4 px-4">Date & Time</th>
@@ -130,26 +130,26 @@ export default function SalesHistoryPage() {
                 <th className="py-4 px-4 text-center">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
               {isLoading ? (
                 [...Array(5)].map((_, i) => (
                   <tr key={i} className="animate-pulse">
-                    <td colSpan={7} className="h-14 bg-slate-900/30" />
+                    <td colSpan={7} className="h-14 bg-slate-200/40 dark:bg-slate-900/30" />
                   </tr>
                 ))
               ) : sales.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-slate-500">
+                  <td colSpan={7} className="py-12 text-center text-slate-400 dark:text-slate-500">
                     No sales records found for this period.
                   </td>
                 </tr>
               ) : (
                 sales.map((sale) => (
-                  <tr key={sale._id} className="hover:bg-slate-900/40 transition-colors">
-                    <td className="py-4 px-6 font-bold font-mono text-white">
+                  <tr key={sale._id} className="hover:bg-slate-50/80 dark:hover:bg-slate-900/40 transition-colors">
+                    <td className="py-4 px-6 font-bold font-mono text-slate-900 dark:text-white">
                       {sale.saleNumber}
                     </td>
-                    <td className="py-4 px-4 text-slate-400">
+                    <td className="py-4 px-4 text-slate-500 dark:text-slate-400">
                       {new Date(sale.createdAt).toLocaleString([], {
                         year: "numeric",
                         month: "short",
@@ -158,24 +158,24 @@ export default function SalesHistoryPage() {
                         minute: "2-digit",
                       })}
                     </td>
-                    <td className="py-4 px-4 text-slate-300 font-medium">
+                    <td className="py-4 px-4 text-slate-700 dark:text-slate-300 font-medium">
                       {sale.cashierName}
                     </td>
-                    <td className="py-4 px-4 text-center text-slate-400">
+                    <td className="py-4 px-4 text-center text-slate-500 dark:text-slate-400">
                       {sale.items?.length || 0}
                     </td>
                     <td className="py-4 px-4 text-center">
-                      <span className="rounded-full bg-slate-800 px-2.5 py-0.5 text-[10px] font-bold uppercase text-slate-300">
+                      <span className="rounded-full bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 px-2.5 py-0.5 text-[10px] font-bold uppercase">
                         {sale.paymentMethod}
                       </span>
                     </td>
-                    <td className="py-4 px-6 text-right font-bold font-mono text-emerald-400">
+                    <td className="py-4 px-6 text-right font-bold font-mono text-emerald-600 dark:text-emerald-400">
                       {formatBDT(sale.totalAmount)}
                     </td>
                     <td className="py-4 px-4 text-center">
                       <button
                         onClick={() => setSelectedSale(sale)}
-                        className="inline-flex items-center gap-1 rounded-lg border border-slate-700/80 bg-slate-800/80 px-2.5 py-1 text-[11px] font-semibold text-slate-300 hover:bg-slate-700 hover:text-white transition-colors"
+                        className="inline-flex items-center gap-1 rounded-lg border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/80 px-2.5 py-1 text-[11px] font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white transition-colors shadow-sm"
                       >
                         <Eye className="h-3.5 w-3.5" />
                         <span>Receipt</span>
@@ -190,7 +190,7 @@ export default function SalesHistoryPage() {
 
         {/* Pagination bar */}
         {pagination.totalPages > 1 && (
-          <div className="flex items-center justify-between border-t border-slate-800/80 px-6 py-4 text-xs text-slate-400">
+          <div className="flex items-center justify-between border-t border-slate-200 dark:border-slate-800/80 px-6 py-4 text-xs text-slate-500 dark:text-slate-400">
             <span>
               Page {pagination.page} of {pagination.totalPages} ({pagination.total} total sales)
             </span>
@@ -198,14 +198,14 @@ export default function SalesHistoryPage() {
               <button
                 disabled={pagination.page <= 1}
                 onClick={() => fetchSales(pagination.page - 1)}
-                className="rounded-lg border border-slate-800 px-3 py-1.5 hover:bg-slate-800 disabled:opacity-40"
+                className="rounded-lg border border-slate-200 dark:border-slate-800 px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-40"
               >
                 Previous
               </button>
               <button
                 disabled={pagination.page >= pagination.totalPages}
                 onClick={() => fetchSales(pagination.page + 1)}
-                className="rounded-lg border border-slate-800 px-3 py-1.5 hover:bg-slate-800 disabled:opacity-40"
+                className="rounded-lg border border-slate-200 dark:border-slate-800 px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-40"
               >
                 Next
               </button>
@@ -216,15 +216,15 @@ export default function SalesHistoryPage() {
 
       {/* RECEIPT VIEW MODAL */}
       {selectedSale && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/85 p-4 backdrop-blur-md">
-          <div className="relative w-full max-w-sm rounded-3xl bg-slate-900 border border-slate-800 p-6 shadow-2xl">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-              <span className="text-sm font-bold text-white font-mono">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-md">
+          <div className="relative w-full max-w-sm rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 shadow-2xl">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+              <span className="text-sm font-bold text-slate-900 dark:text-white font-mono">
                 {selectedSale.saleNumber}
               </span>
               <button
                 onClick={() => setSelectedSale(null)}
-                className="rounded-lg p-1 text-slate-400 hover:text-white"
+                className="rounded-lg p-1 text-slate-400 hover:text-slate-600 dark:hover:text-white"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -233,7 +233,7 @@ export default function SalesHistoryPage() {
             {/* Thermal Receipt Body */}
             <div
               id="thermal-receipt"
-              className="my-4 rounded-xl border border-dashed border-slate-700 bg-white p-5 text-black font-mono text-xs shadow-inner"
+              className="my-4 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 bg-white p-5 text-black font-mono text-xs shadow-inner"
             >
               <div className="text-center pb-3 border-b border-dashed border-neutral-400">
                 <h2 className="text-base font-black tracking-wider uppercase">RETAIL POS BANGLADESH</h2>
@@ -300,7 +300,7 @@ export default function SalesHistoryPage() {
 
             <button
               onClick={() => window.print()}
-              className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-800 py-3 text-xs font-semibold text-white hover:bg-slate-700 transition-colors"
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 py-3 text-xs font-semibold text-slate-800 dark:text-white hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors shadow-sm"
             >
               <Printer className="h-4 w-4" />
               <span>Print This Receipt</span>
