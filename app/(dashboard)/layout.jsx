@@ -125,7 +125,7 @@ export default function DashboardLayout({ children }) {
     if (pathname.startsWith("/products")) return t("nav.products", "Products");
     if (pathname.startsWith("/sales")) return t("nav.sales", "Sales History");
     if (pathname.startsWith("/inventory")) return t("nav.inventory", "Inventory & Audit");
-    return "Retail POS";
+    return t("appName", "Dokandari");
   };
 
   return (
@@ -151,9 +151,15 @@ export default function DashboardLayout({ children }) {
               <Store className="h-6 w-6 text-white" />
             </div>
             <div>
-              <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
-                Retail<span className="text-brand-600 dark:text-brand-400">POS</span>
-              </span>
+              {language === "bn" ? (
+                <span className="text-xl font-bold tracking-tight text-slate-900 dark:text-white font-bengali">
+                  দোকান<span className="text-brand-600 dark:text-brand-400">দারি</span>
+                </span>
+              ) : (
+                <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
+                  Dokan<span className="text-brand-600 dark:text-brand-400">dari</span>
+                </span>
+              )}
               <span className="block text-[11px] font-medium text-slate-500 dark:text-slate-400">
                 {t("appSubtitle", "Bangladesh Edition (৳)")}
               </span>

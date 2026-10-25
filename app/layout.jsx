@@ -11,8 +11,8 @@ const hindSiliguri = Hind_Siliguri({
 });
 
 export const metadata = {
-  title: "Retail POS & Inventory System",
-  description: "High-performance Retail Management & Point of Sale System (Bangladesh Edition ৳)",
+  title: "Dokandari (দোকানদারি) - Retail POS & Inventory",
+  description: "Dokandari (দোকানদারি) - Modern Bilingual Retail Management & Point of Sale System (Bangladesh Edition ৳)",
 };
 
 export default function RootLayout({ children }) {

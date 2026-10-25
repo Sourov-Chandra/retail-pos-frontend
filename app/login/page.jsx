@@ -71,7 +71,7 @@ export default function LoginPage() {
             </div>
           </div>
           <h1 className="mt-4 text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
-            {t("login.signInTitle", "Retail")}<span className="text-brand-600 dark:text-brand-400">{t("login.signInHighlight", "POS")}</span>
+            {t("login.signInTitle", "Dokan")}<span className="text-brand-600 dark:text-brand-400">{t("login.signInHighlight", "dari")}</span>
           </h1>
           <p className="mt-1.5 text-sm text-slate-500 dark:text-slate-400">
             {t("login.signInSubtitle", "Intelligent Point of Sale & Inventory Platform")}

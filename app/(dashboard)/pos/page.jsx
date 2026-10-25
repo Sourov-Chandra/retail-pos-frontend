@@ -536,8 +536,8 @@ export default function POSTerminalPage() {
               className="my-4 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 bg-white p-5 text-black font-mono text-xs shadow-inner"
             >
               <div className="text-center pb-3 border-b border-dashed border-neutral-400">
-                <h2 className="text-base font-black tracking-wider uppercase">{t("pos.receiptTitle", "RETAIL POS BANGLADESH")}</h2>
-                <p className="text-[10px] text-neutral-600">{t("pos.receiptSubtitle", "Smart Retail Management")}</p>
+                <h2 className="text-base font-black tracking-wider uppercase">{t("pos.receiptTitle", "DOKANDARI BANGLADESH")}</h2>
+                <p className="text-[10px] text-neutral-600">{t("pos.receiptSubtitle", "Smart Retail & POS Platform")}</p>
                 <p className="mt-1 text-[10px] text-neutral-500">{t("pos.city", "Dhaka, Bangladesh")}</p>
               </div>
 
