@@ -9,6 +9,26 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: [
+          "var(--font-hind-siliguri)",
+          "'Hind Siliguri'",
+          "Inter",
+          "system-ui",
+          "-apple-system",
+          "BlinkMacSystemFont",
+          "'Segoe UI'",
+          "Roboto",
+          "'Noto Sans Bengali'",
+          "sans-serif",
+        ],
+        bengali: [
+          "var(--font-hind-siliguri)",
+          "'Hind Siliguri'",
+          "'Noto Sans Bengali'",
+          "sans-serif",
+        ],
+      },
       colors: {
         brand: {
           50: "#eef2ff",
