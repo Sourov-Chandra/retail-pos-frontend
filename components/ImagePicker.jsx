@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Upload, Camera, Link as LinkIcon, X, Check, RefreshCw, AlertCircle } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function ImagePicker({ value, onChange }) {
   const [activeTab, setActiveTab] = useState("file"); // "file" | "camera" | "url"
@@ -9,6 +10,7 @@ export default function ImagePicker({ value, onChange }) {
   const [cameraError, setCameraError] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [urlInput, setUrlInput] = useState(value || "");
+  const { t, isBengali } = useLanguage();
 
   const videoRef = useRef(null);
   const streamRef = useRef(null);
@@ -42,7 +44,11 @@ export default function ImagePicker({ value, onChange }) {
       setIsCameraActive(true);
     } catch (err) {
       console.error("Camera access error:", err);
-      setCameraError("Camera access denied or device not found. Please verify permissions.");
+      setCameraError(
+        isBengali
+          ? "ক্যামেরা অ্যাক্সেস পাওয়া যায়নি। অনুগ্রহ করে পারমিশন চেক করুন।"
+          : "Camera access denied or device not found. Please verify permissions."
+      );
     }
   };
 
@@ -70,10 +76,12 @@ export default function ImagePicker({ value, onChange }) {
       console.error("Upload error:", err);
       if (err.name === "TypeError" && err.message.includes("fetch")) {
         alert(
-          "Cannot connect to the backend server.\n\nPlease make sure your backend is running on http://localhost:5000 (cd server && npm run dev)."
+          isBengali
+            ? "ব্যাকএন্ড সার্ভারের সাথে সংযোগ স্থাপন করা যাচ্ছে না।\n\nঅনুগ্রহ করে নিশ্চিত করুন ব্যাকএন্ড চালু আছে (http://localhost:5000)।"
+            : "Cannot connect to the backend server.\n\nPlease make sure your backend is running on http://localhost:5000 (cd server && npm run dev)."
         );
       } else {
-        alert(err.message || "Failed to upload image.");
+        alert(err.message || (isBengali ? "ছবি আপলোড ব্যর্থ হয়েছে।" : "Failed to upload image."));
       }
     } finally {
       setIsUploading(false);
@@ -121,7 +129,7 @@ export default function ImagePicker({ value, onChange }) {
   return (
     <div className="space-y-3">
       <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-        Product Image
+        {t("imagePicker.label", "Product Image")}
       </label>
 
       {/* Current Image Preview */}
@@ -138,7 +146,9 @@ export default function ImagePicker({ value, onChange }) {
             />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-semibold text-slate-900 dark:text-white">Image Selected</p>
+            <p className="text-xs font-semibold text-slate-900 dark:text-white">
+              {t("imagePicker.selected", "Image Selected")}
+            </p>
             <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate font-mono mt-0.5">{value}</p>
           </div>
           <button
@@ -167,7 +177,7 @@ export default function ImagePicker({ value, onChange }) {
               }`}
             >
               <Upload className="h-3.5 w-3.5" />
-              <span>Upload File</span>
+              <span>{t("imagePicker.uploadTab", "Upload File")}</span>
             </button>
 
             <button
@@ -183,7 +193,7 @@ export default function ImagePicker({ value, onChange }) {
               }`}
             >
               <Camera className="h-3.5 w-3.5" />
-              <span>Take Photo</span>
+              <span>{t("imagePicker.cameraTab", "Take Photo")}</span>
             </button>
 
             <button
@@ -199,7 +209,7 @@ export default function ImagePicker({ value, onChange }) {
               }`}
             >
               <LinkIcon className="h-3.5 w-3.5" />
-              <span>Image URL</span>
+              <span>{t("imagePicker.urlTab", "Image URL")}</span>
             </button>
           </div>
 
@@ -224,8 +234,12 @@ export default function ImagePicker({ value, onChange }) {
                 ) : (
                   <>
                     <Upload className="h-6 w-6 text-brand-500" />
-                    <span className="font-medium text-slate-700 dark:text-slate-300">Choose an image from your computer</span>
-                    <span className="text-[10px] text-slate-400 dark:text-slate-500">AVIF, WebP, PNG, JPG, GIF up to 15MB</span>
+                    <span className="font-medium text-slate-700 dark:text-slate-300">
+                      {t("imagePicker.dropzonePrompt", "Choose an image from your computer")}
+                    </span>
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500">
+                      {t("imagePicker.dropzoneSub", "AVIF, WebP, PNG, JPG, GIF up to 15MB")}
+                    </span>
                   </>
                 )}
               </button>
@@ -253,7 +267,9 @@ export default function ImagePicker({ value, onChange }) {
                     <div className="absolute inset-0 flex items-center justify-center bg-slate-950/80">
                       <div className="flex flex-col items-center gap-2">
                         <div className="h-6 w-6 animate-spin rounded-full border-2 border-brand-500 border-t-transparent" />
-                        <span className="text-xs text-slate-400">Starting camera...</span>
+                        <span className="text-xs text-slate-400">
+                          {t("imagePicker.startingCamera", "Starting camera...")}
+                        </span>
                       </div>
                     </div>
                   )}
@@ -268,7 +284,7 @@ export default function ImagePicker({ value, onChange }) {
                   className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand-600 to-indigo-600 py-2.5 text-xs font-bold text-white shadow-md hover:brightness-110 active:scale-95"
                 >
                   <Camera className="h-4 w-4" />
-                  <span>Snap & Use Photo</span>
+                  <span>{t("imagePicker.snapPhoto", "Snap & Use Photo")}</span>
                 </button>
               )}
             </div>
@@ -281,7 +297,7 @@ export default function ImagePicker({ value, onChange }) {
                 type="url"
                 value={urlInput}
                 onChange={(e) => setUrlInput(e.target.value)}
-                placeholder="https://example.com/product-image.jpg"
+                placeholder={t("imagePicker.urlPlaceholder", "https://example.com/product-image.jpg")}
                 className="flex-1 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 py-2 px-3 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-brand-500 focus:outline-none shadow-sm"
               />
               <button
@@ -289,7 +305,7 @@ export default function ImagePicker({ value, onChange }) {
                 onClick={handleUrlApply}
                 className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 px-3.5 py-2 text-xs font-semibold text-slate-700 dark:text-white hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors shadow-sm"
               >
-                Apply
+                {t("imagePicker.applyUrl", "Apply")}
               </button>
             </div>
           )}

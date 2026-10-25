@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { apiClient } from "@/lib/api-client";
+import { useLanguage } from "@/context/LanguageContext";
 import {
   Boxes,
   Plus,
@@ -19,6 +20,7 @@ export default function InventoryAuditPage() {
   const [products, setProducts] = useState([]);
   const [pagination, setPagination] = useState({ page: 1, limit: 30, total: 0, totalPages: 1 });
   const [isLoading, setIsLoading] = useState(true);
+  const { t, isBengali, toBengaliDigits } = useLanguage();
 
   // Stock Adjustment Modal
   const [isAdjustModalOpen, setIsAdjustModalOpen] = useState(false);
@@ -28,6 +30,8 @@ export default function InventoryAuditPage() {
   const [reason, setReason] = useState("");
   const [modalError, setModalError] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+
+  const num = (n) => (isBengali ? toBengaliDigits(n) : n);
 
   const loadData = async (page = 1) => {
     setIsLoading(true);
@@ -60,18 +64,18 @@ export default function InventoryAuditPage() {
     setModalError("");
 
     if (!selectedProductId) {
-      setModalError("Please select a product to adjust.");
+      setModalError(isBengali ? "অনুগ্রহ করে একটি পণ্য নির্বাচন করুন।" : "Please select a product to adjust.");
       return;
     }
 
     const qty = parseInt(quantity, 10);
     if (isNaN(qty) || qty <= 0) {
-      setModalError("Please enter a valid positive quantity.");
+      setModalError(isBengali ? "অনুগ্রহ করে সঠিক পরিমাণ সংখ্যা লিখুন।" : "Please enter a valid positive quantity.");
       return;
     }
 
     if (!reason.trim()) {
-      setModalError("A mandatory audit reason is required.");
+      setModalError(isBengali ? "একটি অডিট কারণ উল্লেখ করা বাধ্যতামূলক।" : "A mandatory audit reason is required.");
       return;
     }
 
@@ -96,13 +100,12 @@ export default function InventoryAuditPage() {
         loadData(1);
       }
     } catch (err) {
-      setModalError(err.message || "Failed to adjust stock.");
+      setModalError(err.message || (isBengali ? "স্টক সমন্বয় ব্যর্থ হয়েছে।" : "Failed to adjust stock."));
     } finally {
       setIsSaving(false);
     }
   };
 
-  // Helper mapping for product names in movements table
   const productMap = new Map(products.map((p) => [p._id, p]));
 
   return (
@@ -110,9 +113,11 @@ export default function InventoryAuditPage() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white sm:text-3xl">Inventory & Stock Audit</h1>
+          <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white sm:text-3xl">
+            {t("inventory.title", "Inventory & Stock Audit")}
+          </h1>
           <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-            Append-only audit trail of sales deductions, initial stocks, and manual adjustments.
+            {t("inventory.subtitle", "Append-only audit trail of sales deductions, initial stocks, and manual adjustments.")}
           </p>
         </div>
 
@@ -121,7 +126,7 @@ export default function InventoryAuditPage() {
           className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-amber-600 to-orange-600 px-5 py-3 text-xs font-bold text-white shadow-lg shadow-amber-500/20 transition-all hover:brightness-110 active:scale-95"
         >
           <Boxes className="h-4 w-4" />
-          <span>Manual Stock Adjustment</span>
+          <span>{t("inventory.manualAdjustment", "Manual Stock Adjustment")}</span>
         </button>
       </div>
 
@@ -131,12 +136,12 @@ export default function InventoryAuditPage() {
           <table className="w-full text-left text-xs">
             <thead className="border-b border-slate-200 dark:border-slate-800/80 bg-slate-100/70 dark:bg-slate-900/60 uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">
               <tr>
-                <th className="py-4 px-6">Timestamp</th>
-                <th className="py-4 px-4">Product</th>
-                <th className="py-4 px-4 text-center">Movement Type</th>
-                <th className="py-4 px-4 text-center">Change</th>
-                <th className="py-4 px-4 text-center">Stock (Before → After)</th>
-                <th className="py-4 px-6">Audit Reason / Note</th>
+                <th className="py-4 px-6">{t("inventory.tableTimestamp", "Timestamp")}</th>
+                <th className="py-4 px-4">{t("inventory.tableProduct", "Product")}</th>
+                <th className="py-4 px-4 text-center">{t("inventory.tableType", "Movement Type")}</th>
+                <th className="py-4 px-4 text-center">{t("inventory.tableChange", "Change")}</th>
+                <th className="py-4 px-4 text-center">{t("inventory.tableStockRatio", "Stock (Before → After)")}</th>
+                <th className="py-4 px-6">{t("inventory.tableReason", "Audit Reason / Note")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
@@ -149,7 +154,7 @@ export default function InventoryAuditPage() {
               ) : movements.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="py-12 text-center text-slate-400 dark:text-slate-500">
-                    No stock movements recorded yet.
+                    {t("inventory.noMovements", "No stock movements recorded yet.")}
                   </td>
                 </tr>
               ) : (
@@ -187,11 +192,11 @@ export default function InventoryAuditPage() {
                       </td>
                       <td className="py-4 px-4 text-center font-bold font-mono">
                         <span className={isPositive ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}>
-                          {isPositive ? `+${m.quantityChange}` : m.quantityChange}
+                          {isPositive ? `+${num(m.quantityChange)}` : num(m.quantityChange)}
                         </span>
                       </td>
                       <td className="py-4 px-4 text-center font-mono text-slate-600 dark:text-slate-300">
-                        {m.stockBefore} → <span className="font-bold text-slate-900 dark:text-white">{m.stockAfter}</span>
+                        {num(m.stockBefore)} → <span className="font-bold text-slate-900 dark:text-white">{num(m.stockAfter)}</span>
                       </td>
                       <td className="py-4 px-6 text-slate-600 dark:text-slate-300 font-medium max-w-xs truncate">
                         {m.note || "—"}
@@ -208,7 +213,7 @@ export default function InventoryAuditPage() {
         {pagination.totalPages > 1 && (
           <div className="flex items-center justify-between border-t border-slate-200 dark:border-slate-800/80 px-6 py-4 text-xs text-slate-500 dark:text-slate-400">
             <span>
-              Page {pagination.page} of {pagination.totalPages} ({pagination.total} movements recorded)
+              {t("page", "Page")} {num(pagination.page)} {t("of", "of")} {num(pagination.totalPages)} ({num(pagination.total)} {t("total", "movements recorded")})
             </span>
             <div className="flex items-center gap-2">
               <button
@@ -216,14 +221,14 @@ export default function InventoryAuditPage() {
                 onClick={() => loadData(pagination.page - 1)}
                 className="rounded-lg border border-slate-200 dark:border-slate-800 px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-40"
               >
-                Previous
+                {t("previous", "Previous")}
               </button>
               <button
                 disabled={pagination.page >= pagination.totalPages}
                 onClick={() => loadData(pagination.page + 1)}
                 className="rounded-lg border border-slate-200 dark:border-slate-800 px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-40"
               >
-                Next
+                {t("next", "Next")}
               </button>
             </div>
           </div>
@@ -239,7 +244,9 @@ export default function InventoryAuditPage() {
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400">
                   <Boxes className="h-5 w-5" />
                 </div>
-                <h2 className="text-base font-bold text-slate-900 dark:text-white">Manual Stock Adjustment</h2>
+                <h2 className="text-base font-bold text-slate-900 dark:text-white">
+                  {t("inventory.adjustModalTitle", "Manual Stock Adjustment")}
+                </h2>
               </div>
               <button
                 onClick={() => setIsAdjustModalOpen(false)}
@@ -259,7 +266,7 @@ export default function InventoryAuditPage() {
             <form onSubmit={handleAdjustSubmit} className="mt-4 space-y-4">
               <div>
                 <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                  Select Product *
+                  {t("inventory.selectProduct", "Select Product *")}
                 </label>
                 <select
                   required
@@ -267,10 +274,10 @@ export default function InventoryAuditPage() {
                   onChange={(e) => setSelectedProductId(e.target.value)}
                   className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 py-2.5 px-3.5 text-xs text-slate-900 dark:text-white focus:border-brand-500 focus:outline-none"
                 >
-                  <option value="">-- Choose a product --</option>
+                  <option value="">{t("inventory.chooseProduct", "-- Choose a product --")}</option>
                   {products.map((p) => (
                     <option key={p._id} value={p._id}>
-                      {p.name} ({p.sku}) — Available: {p.stockQuantity}
+                      {p.name} ({p.sku}) — {t("inventory.available", "Available:")} {num(p.stockQuantity)}
                     </option>
                   ))}
                 </select>
@@ -278,7 +285,7 @@ export default function InventoryAuditPage() {
 
               <div>
                 <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                  Adjustment Type
+                  {t("inventory.adjustmentType", "Adjustment Type")}
                 </label>
                 <div className="grid grid-cols-2 gap-3">
                   <button
@@ -291,7 +298,7 @@ export default function InventoryAuditPage() {
                     }`}
                   >
                     <Plus className="h-4 w-4" />
-                    <span>Stock In (+)</span>
+                    <span>{t("inventory.stockIn", "Stock In (+)")}</span>
                   </button>
 
                   <button
@@ -304,14 +311,14 @@ export default function InventoryAuditPage() {
                     }`}
                   >
                     <Minus className="h-4 w-4" />
-                    <span>Damage / Deduction (−)</span>
+                    <span>{t("inventory.damageDeduction", "Damage / Deduction (−)")}</span>
                   </button>
                 </div>
               </div>
 
               <div>
                 <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                  Quantity *
+                  {t("inventory.quantity", "Quantity *")}
                 </label>
                 <input
                   type="number"
@@ -325,14 +332,14 @@ export default function InventoryAuditPage() {
 
               <div>
                 <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                  Mandatory Audit Reason *
+                  {t("inventory.reasonLabel", "Mandatory Audit Reason *")}
                 </label>
                 <input
                   type="text"
                   required
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
-                  placeholder="e.g. Broken in transit, Supplier replenishment, Stock count fix"
+                  placeholder={t("inventory.reasonPlaceholder", "e.g. Broken in transit, Supplier replenishment, Stock count fix")}
                   className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 py-2.5 px-3.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-brand-500 focus:outline-none"
                 />
               </div>
@@ -343,14 +350,14 @@ export default function InventoryAuditPage() {
                   onClick={() => setIsAdjustModalOpen(false)}
                   className="rounded-xl border border-slate-200 dark:border-slate-800 px-4 py-2.5 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                 >
-                  Cancel
+                  {t("cancel", "Cancel")}
                 </button>
                 <button
                   type="submit"
                   disabled={isSaving}
                   className="rounded-xl bg-amber-600 px-5 py-2.5 text-xs font-bold text-white hover:bg-amber-500 transition-colors shadow-lg shadow-amber-500/20 disabled:opacity-60"
                 >
-                  {isSaving ? "Applying..." : "Confirm Adjustment"}
+                  {isSaving ? t("inventory.applying", "Applying...") : t("inventory.confirmAdjustment", "Confirm Adjustment")}
                 </button>
               </div>
             </form>

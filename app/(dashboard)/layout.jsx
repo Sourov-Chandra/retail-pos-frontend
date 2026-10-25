@@ -5,6 +5,8 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
 import ThemeToggle from "@/components/ThemeToggle";
+import LanguageToggle from "@/components/LanguageToggle";
+import { useLanguage } from "@/context/LanguageContext";
 import {
   LayoutDashboard,
   ShoppingCart,
@@ -20,41 +22,42 @@ import {
   CreditCard,
 } from "lucide-react";
 
-const NAV_ITEMS = [
-  {
-    name: "Dashboard",
-    href: "/dashboard",
-    icon: LayoutDashboard,
-  },
-  {
-    name: "POS Terminal",
-    href: "/pos",
-    icon: ShoppingCart,
-    badge: "Register",
-  },
-  {
-    name: "Products",
-    href: "/products",
-    icon: Package,
-  },
-  {
-    name: "Sales History",
-    href: "/sales",
-    icon: Receipt,
-  },
-  {
-    name: "Inventory & Audit",
-    href: "/inventory",
-    icon: Boxes,
-  },
-];
-
 export default function DashboardLayout({ children }) {
   const router = useRouter();
   const pathname = usePathname();
+  const { t, language } = useLanguage();
   const [currentUser, setCurrentUser] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
+
+  const NAV_ITEMS = [
+    {
+      name: t("nav.dashboard", "Dashboard"),
+      href: "/dashboard",
+      icon: LayoutDashboard,
+    },
+    {
+      name: t("nav.pos", "POS Terminal"),
+      href: "/pos",
+      icon: ShoppingCart,
+      badge: t("nav.register", "Register"),
+    },
+    {
+      name: t("nav.products", "Products"),
+      href: "/products",
+      icon: Package,
+    },
+    {
+      name: t("nav.sales", "Sales History"),
+      href: "/sales",
+      icon: Receipt,
+    },
+    {
+      name: t("nav.inventory", "Inventory & Audit"),
+      href: "/inventory",
+      icon: Boxes,
+    },
+  ];
 
   useEffect(() => {
     let isMounted = true;
@@ -93,10 +96,10 @@ export default function DashboardLayout({ children }) {
   const handleSignOut = async () => {
     try {
       await authClient.signOut();
-      router.replace("/login");
+      window.location.replace("/login");
     } catch (err) {
       console.error("Sign out error:", err);
-      router.replace("/login");
+      window.location.replace("/login");
     }
   };
 
@@ -105,13 +108,25 @@ export default function DashboardLayout({ children }) {
       <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-950">
         <div className="flex flex-col items-center gap-3">
           <div className="h-10 w-10 animate-spin rounded-full border-4 border-brand-500 border-t-transparent" />
-          <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Verifying session...</p>
+          <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+            {t("verifyingSession", "Verifying session...")}
+          </p>
         </div>
       </div>
     );
   }
 
   const isOwner = currentUser?.role === "owner";
+
+  // Current page title mapping
+  const getPageTitle = () => {
+    if (pathname.startsWith("/dashboard")) return t("nav.dashboard", "Dashboard");
+    if (pathname.startsWith("/pos")) return t("nav.pos", "POS Terminal");
+    if (pathname.startsWith("/products")) return t("nav.products", "Products");
+    if (pathname.startsWith("/sales")) return t("nav.sales", "Sales History");
+    if (pathname.startsWith("/inventory")) return t("nav.inventory", "Inventory & Audit");
+    return "Retail POS";
+  };
 
   return (
     <div className="flex min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-200">
@@ -140,7 +155,7 @@ export default function DashboardLayout({ children }) {
                 Retail<span className="text-brand-600 dark:text-brand-400">POS</span>
               </span>
               <span className="block text-[11px] font-medium text-slate-500 dark:text-slate-400">
-                Bangladesh Edition (৳)
+                {t("appSubtitle", "Bangladesh Edition (৳)")}
               </span>
             </div>
           </Link>
@@ -155,7 +170,7 @@ export default function DashboardLayout({ children }) {
         {/* Navigation Links */}
         <nav className="flex-1 space-y-1.5 px-4 py-6">
           <div className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-            Operations
+            {t("operations", "Operations")}
           </div>
           {NAV_ITEMS.map((item) => {
             const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
@@ -167,7 +182,7 @@ export default function DashboardLayout({ children }) {
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={`group flex items-center justify-between rounded-xl px-3.5 py-3 text-sm font-medium transition-all ${
                   isActive
-                    ? "bg-brand-500/10 text-brand-600 border border-brand-500/30 shadow-sm dark:bg-brand-500/15 dark:text-brand-300 dark:border-brand-500/30"
+                    ? "bg-brand-500/10 text-brand-600 border border-brand-500/30 shadow-sm dark:bg-brand-500/15 dark:text-brand-300 dark:border-brand-500/30 font-semibold"
                     : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-900 dark:hover:text-slate-200"
                 }`}
               >
@@ -201,7 +216,7 @@ export default function DashboardLayout({ children }) {
                 </div>
                 <div className="truncate">
                   <p className="truncate text-sm font-semibold text-slate-900 dark:text-white">
-                    {currentUser?.name || "Shop User"}
+                    {currentUser?.name || t("shopUser", "Shop User")}
                   </p>
                   <p className="truncate text-xs text-slate-500 dark:text-slate-400">
                     {currentUser?.email}
@@ -215,22 +230,22 @@ export default function DashboardLayout({ children }) {
                 {isOwner ? (
                   <span className="flex items-center gap-1 text-indigo-600 dark:text-indigo-400">
                     <Shield className="h-3 w-3" />
-                    <span>Owner</span>
+                    <span>{t("owner", "Owner")}</span>
                   </span>
                 ) : (
                   <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
-                    <span>Cashier</span>
+                    <span>{t("cashier", "Cashier")}</span>
                   </span>
                 )}
               </div>
 
               <button
                 onClick={handleSignOut}
-                title="Sign Out"
+                title={t("logout", "Sign Out")}
                 className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-slate-500 transition-colors hover:bg-rose-500/10 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400"
               >
                 <LogOut className="h-3.5 w-3.5" />
-                <span>Logout</span>
+                <span>{t("logout", "Logout")}</span>
               </button>
             </div>
           </div>
@@ -250,13 +265,14 @@ export default function DashboardLayout({ children }) {
             </button>
             <div>
               <h2 className="text-lg font-bold text-slate-900 dark:text-white capitalize lg:text-xl">
-                {pathname.replace("/", "").replace("-", " ") || "Dashboard"}
+                {getPageTitle()}
               </h2>
             </div>
           </div>
 
-          {/* Quick Action Pill & Theme Toggle */}
+          {/* Quick Action Pill, Language Switcher & Theme Toggle */}
           <div className="flex items-center gap-2 sm:gap-3">
+            <LanguageToggle />
             <ThemeToggle />
 
             <Link
@@ -264,7 +280,7 @@ export default function DashboardLayout({ children }) {
               className="hidden sm:inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-brand-600 to-indigo-600 px-4 py-2 text-xs font-semibold text-white shadow-md shadow-brand-500/20 transition-all hover:brightness-110 active:scale-95"
             >
               <CreditCard className="h-4 w-4" />
-              <span>Open POS Register</span>
+              <span>{t("openPos", "Open POS Register")}</span>
             </Link>
           </div>
         </header>

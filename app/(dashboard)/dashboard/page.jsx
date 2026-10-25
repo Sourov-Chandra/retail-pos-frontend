@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { apiClient } from "@/lib/api-client";
 import { formatBDT } from "@/lib/money";
+import { useLanguage } from "@/context/LanguageContext";
 import {
   TrendingUp,
   CreditCard,
@@ -22,6 +23,7 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState(null);
+  const { t, isBengali, toBengaliDigits } = useLanguage();
 
   const fetchSummary = async () => {
     try {
@@ -46,6 +48,8 @@ export default function DashboardPage() {
     setIsRefreshing(true);
     fetchSummary();
   };
+
+  const num = (n) => (isBengali ? toBengaliDigits(n) : n);
 
   if (isLoading) {
     return (
@@ -72,14 +76,14 @@ export default function DashboardPage() {
             <div className="flex items-center gap-2">
               <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
               <span className="text-xs font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
-                Register Open • Live System
+                {t("dashboard.liveRegister", "Register Open • Live System")}
               </span>
             </div>
             <h1 className="mt-2 text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
-              Retail Intelligence Hub
+              {t("dashboard.title", "Retail Intelligence Hub")}
             </h1>
             <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-              Overview for today ({today?.date}) • Business Timezone:{" "}
+              {t("dashboard.overviewFor", "Overview for today")} ({today?.date}) • {t("dashboard.timezone", "Business Timezone")}:{" "}
               <span className="text-slate-700 dark:text-slate-300 font-medium">{today?.timezone}</span>
             </p>
           </div>
@@ -91,14 +95,14 @@ export default function DashboardPage() {
               className="flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-900/60 px-4 py-2.5 text-xs font-medium text-slate-700 dark:text-slate-300 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white shadow-sm"
             >
               <RefreshCw className={`h-3.5 w-3.5 ${isRefreshing ? "animate-spin text-brand-500" : ""}`} />
-              <span>Refresh Stats</span>
+              <span>{t("dashboard.refresh", "Refresh Stats")}</span>
             </button>
             <Link
               href="/pos"
               className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-brand-600 to-indigo-600 px-5 py-2.5 text-xs font-bold text-white shadow-lg shadow-brand-500/25 transition-all hover:brightness-110 active:scale-95"
             >
               <Sparkles className="h-4 w-4" />
-              <span>Start New Checkout</span>
+              <span>{t("dashboard.startCheckout", "Start New Checkout")}</span>
             </Link>
           </div>
         </div>
@@ -116,7 +120,7 @@ export default function DashboardPage() {
         <div className="glass-card group relative overflow-hidden rounded-3xl p-6 transition-all">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-              Today's Revenue
+              {t("dashboard.todayRevenue", "Today's Revenue")}
             </span>
             <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 group-hover:scale-110 transition-transform">
               <TrendingUp className="h-5 w-5" />
@@ -129,7 +133,7 @@ export default function DashboardPage() {
           </div>
           <div className="mt-3 flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400">
             <CheckCircle2 className="h-3.5 w-3.5" />
-            <span>Net recognized revenue</span>
+            <span>{t("dashboard.netRevenue", "Net recognized revenue")}</span>
           </div>
         </div>
 
@@ -137,7 +141,7 @@ export default function DashboardPage() {
         <div className="glass-card group relative overflow-hidden rounded-3xl p-6 transition-all">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-              Sales Completed
+              {t("dashboard.salesCompleted", "Sales Completed")}
             </span>
             <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-500/15 text-brand-600 dark:text-brand-400 border border-brand-500/30 group-hover:scale-110 transition-transform">
               <CreditCard className="h-5 w-5" />
@@ -145,11 +149,11 @@ export default function DashboardPage() {
           </div>
           <div className="mt-4">
             <span className="text-2xl font-black tracking-tight text-slate-900 dark:text-white sm:text-3xl font-mono">
-              {today?.salesCount || 0}
+              {num(today?.salesCount || 0)}
             </span>
           </div>
           <div className="mt-3 text-xs text-slate-500 dark:text-slate-400">
-            <span>Across all counters today</span>
+            <span>{t("dashboard.allCounters", "Across all counters today")}</span>
           </div>
         </div>
 
@@ -157,7 +161,7 @@ export default function DashboardPage() {
         <div className="glass-card group relative overflow-hidden rounded-3xl p-6 transition-all">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-              Active Catalog
+              {t("dashboard.activeCatalog", "Active Catalog")}
             </span>
             <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30 group-hover:scale-110 transition-transform">
               <Package className="h-5 w-5" />
@@ -165,11 +169,11 @@ export default function DashboardPage() {
           </div>
           <div className="mt-4">
             <span className="text-2xl font-black tracking-tight text-slate-900 dark:text-white sm:text-3xl font-mono">
-              {inventory?.activeProductsCount || 0}
+              {num(inventory?.activeProductsCount || 0)}
             </span>
           </div>
           <div className="mt-3 text-xs text-slate-500 dark:text-slate-400">
-            <span>Available for sale in POS</span>
+            <span>{t("dashboard.availableInPos", "Available for sale in POS")}</span>
           </div>
         </div>
 
@@ -177,7 +181,7 @@ export default function DashboardPage() {
         <div className="glass-card group relative overflow-hidden rounded-3xl p-6 transition-all">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-              Stock Warnings
+              {t("dashboard.stockWarnings", "Stock Warnings")}
             </span>
             <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 group-hover:scale-110 transition-transform">
               <AlertTriangle className="h-5 w-5" />
@@ -185,16 +189,16 @@ export default function DashboardPage() {
           </div>
           <div className="mt-4 flex items-baseline gap-2">
             <span className="text-2xl font-black tracking-tight text-slate-900 dark:text-white sm:text-3xl font-mono">
-              {inventory?.lowStockCount || 0}
+              {num(inventory?.lowStockCount || 0)}
             </span>
-            <span className="text-xs text-slate-500 dark:text-slate-400">items below threshold</span>
+            <span className="text-xs text-slate-500 dark:text-slate-400">{t("dashboard.itemsBelowThreshold", "items below threshold")}</span>
           </div>
           <div className="mt-3">
             <Link
               href="/inventory"
               className="inline-flex items-center gap-1 text-xs font-medium text-amber-600 dark:text-amber-400 hover:underline"
             >
-              <span>Review inventory</span>
+              <span>{t("dashboard.reviewInventory", "Review inventory")}</span>
               <ArrowUpRight className="h-3 w-3" />
             </Link>
           </div>
@@ -210,22 +214,22 @@ export default function DashboardPage() {
               <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-brand-500/15 text-brand-600 dark:text-brand-400">
                 <ShoppingBag className="h-4 w-4" />
               </div>
-              <h2 className="text-base font-bold text-slate-900 dark:text-white">Best Selling Items</h2>
+              <h2 className="text-base font-bold text-slate-900 dark:text-white">{t("dashboard.bestSelling", "Best Selling Items")}</h2>
             </div>
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">All-time volume</span>
+            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">{t("dashboard.allTimeVolume", "All-time volume")}</span>
           </div>
 
           <div className="mt-4 divide-y divide-slate-100 dark:divide-slate-800/60">
             {bestSellingProducts.length === 0 ? (
               <div className="py-12 text-center text-sm text-slate-500">
-                No transaction data recorded yet.
+                {t("dashboard.noTransactions", "No transaction data recorded yet.")}
               </div>
             ) : (
               bestSellingProducts.map((item, index) => (
                 <div key={item._id || index} className="flex items-center justify-between py-3.5">
                   <div className="flex items-center gap-3">
                     <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-100 text-xs font-bold text-slate-700 border border-slate-200 dark:bg-slate-900 dark:text-slate-300 dark:border-slate-800">
-                      #{index + 1}
+                      #{num(index + 1)}
                     </span>
                     <div>
                       <p className="text-sm font-semibold text-slate-900 dark:text-white">{item.productName}</p>
@@ -237,7 +241,7 @@ export default function DashboardPage() {
                       {formatBDT(item.totalRevenue)}
                     </p>
                     <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                      {item.quantitySold} units sold
+                      {num(item.quantitySold)} {t("dashboard.unitsSold", "units sold")}
                     </p>
                   </div>
                 </div>
@@ -253,20 +257,20 @@ export default function DashboardPage() {
               <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-indigo-500/15 text-indigo-600 dark:text-indigo-400">
                 <Clock className="h-4 w-4" />
               </div>
-              <h2 className="text-base font-bold text-slate-900 dark:text-white">Recent Transactions</h2>
+              <h2 className="text-base font-bold text-slate-900 dark:text-white">{t("dashboard.recentTransactions", "Recent Transactions")}</h2>
             </div>
             <Link
               href="/sales"
               className="text-xs font-semibold text-brand-600 hover:text-brand-500 dark:text-brand-400 dark:hover:text-brand-300 transition-colors"
             >
-              View Full History →
+              {t("dashboard.viewFullHistory", "View Full History →")}
             </Link>
           </div>
 
           <div className="mt-4 divide-y divide-slate-100 dark:divide-slate-800/60">
             {recentSales.length === 0 ? (
               <div className="py-12 text-center text-sm text-slate-500">
-                No recent sales recorded.
+                {t("dashboard.noRecentSales", "No recent sales recorded.")}
               </div>
             ) : (
               recentSales.map((sale) => (
@@ -281,7 +285,7 @@ export default function DashboardPage() {
                       </span>
                     </div>
                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                      Cashier: {sale.cashierName} • {sale.itemsCount} items
+                      {sale.cashierName} • {num(sale.itemsCount)} {t("dashboard.items", "items")}
                     </p>
                   </div>
                   <div className="text-right">

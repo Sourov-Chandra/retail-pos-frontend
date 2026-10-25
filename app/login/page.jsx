@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import ThemeToggle from "@/components/ThemeToggle";
+import LanguageToggle from "@/components/LanguageToggle";
+import { useLanguage } from "@/context/LanguageContext";
 import { Store, ShieldCheck, Lock, Mail, ArrowRight, AlertCircle, Sparkles } from "lucide-react";
 
 export default function LoginPage() {
@@ -12,11 +14,12 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const { t, isBengali } = useLanguage();
 
   const handleLogin = async (e) => {
     e?.preventDefault();
     if (!email || !password) {
-      setErrorMsg("Please enter both email and password.");
+      setErrorMsg(isBengali ? "ইমেইল ও পাসওয়ার্ড উভয়ই প্রদান করুন।" : "Please enter both email and password.");
       return;
     }
 
@@ -30,12 +33,12 @@ export default function LoginPage() {
       });
 
       if (res.error) {
-        setErrorMsg(res.error.message || "Invalid credentials. Please verify and try again.");
+        setErrorMsg(res.error.message || (isBengali ? "ভুল তথ্য প্রদান করা হয়েছে। পুনরায় চেষ্টা করুন।" : "Invalid credentials. Please verify and try again."));
       } else {
         window.location.href = "/dashboard";
       }
     } catch (err) {
-      setErrorMsg(err.message || "Failed to sign in. Please verify your connection.");
+      setErrorMsg(err.message || (isBengali ? "সাইন ইন ব্যর্থ হয়েছে। সংযোগ যাচাই করুন।" : "Failed to sign in. Please verify your connection."));
     } finally {
       setIsLoading(false);
     }
@@ -49,8 +52,9 @@ export default function LoginPage() {
 
   return (
     <div className="relative flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-950 px-4 py-12 selection:bg-brand-500 selection:text-white transition-colors duration-200">
-      {/* Top right theme toggle */}
-      <div className="absolute top-6 right-6 z-20">
+      {/* Top right language & theme toggle */}
+      <div className="absolute top-6 right-6 z-20 flex items-center gap-2">
+        <LanguageToggle />
         <ThemeToggle />
       </div>
 
@@ -67,10 +71,10 @@ export default function LoginPage() {
             </div>
           </div>
           <h1 className="mt-4 text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
-            Retail<span className="text-brand-600 dark:text-brand-400">POS</span>
+            {t("login.signInTitle", "Retail")}<span className="text-brand-600 dark:text-brand-400">{t("login.signInHighlight", "POS")}</span>
           </h1>
           <p className="mt-1.5 text-sm text-slate-500 dark:text-slate-400">
-            Intelligent Point of Sale & Inventory Platform
+            {t("login.signInSubtitle", "Intelligent Point of Sale & Inventory Platform")}
           </p>
         </div>
 
@@ -86,7 +90,7 @@ export default function LoginPage() {
           <form onSubmit={handleLogin} className="space-y-5">
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                Email Address
+                {t("login.email", "Email Address")}
               </label>
               <div className="relative">
                 <Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
@@ -94,7 +98,7 @@ export default function LoginPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@company.com"
+                  placeholder={t("login.emailPlaceholder", "name@company.com")}
                   required
                   className="w-full rounded-xl border border-slate-200 dark:border-slate-700/70 bg-white dark:bg-slate-900/80 py-3 pl-10 pr-4 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 transition-all focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/10 shadow-sm"
                 />
@@ -103,7 +107,7 @@ export default function LoginPage() {
 
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                Password
+                {t("login.password", "Password")}
               </label>
               <div className="relative">
                 <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
@@ -111,7 +115,7 @@ export default function LoginPage() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••••••"
+                  placeholder={t("login.passwordPlaceholder", "••••••••••••")}
                   required
                   className="w-full rounded-xl border border-slate-200 dark:border-slate-700/70 bg-white dark:bg-slate-900/80 py-3 pl-10 pr-4 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 transition-all focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/10 shadow-sm"
                 />
@@ -127,7 +131,7 @@ export default function LoginPage() {
                 <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
               ) : (
                 <>
-                  <span>Sign In to Terminal</span>
+                  <span>{t("login.signInButton", "Sign In to Terminal")}</span>
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                 </>
               )}
@@ -142,7 +146,7 @@ export default function LoginPage() {
               className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700/60 bg-slate-100/70 dark:bg-slate-900/40 py-2.5 text-xs font-medium text-slate-700 dark:text-slate-300 transition-colors hover:border-brand-500/50 hover:bg-slate-200/70 dark:hover:bg-slate-800/60 hover:text-brand-600 dark:hover:text-white"
             >
               <Sparkles className="h-3.5 w-3.5 text-amber-500" />
-              <span>Fill Initial Owner Credentials</span>
+              <span>{t("login.demoButton", "Fill Initial Owner Credentials")}</span>
             </button>
           </div>
         </div>
@@ -151,10 +155,10 @@ export default function LoginPage() {
         <div className="mt-8 flex items-center justify-center gap-4 text-xs text-slate-500">
           <div className="flex items-center gap-1.5">
             <ShieldCheck className="h-4 w-4 text-emerald-500 dark:text-emerald-400" />
-            <span>Multi-document Transaction Secure</span>
+            <span>{t("login.secureBadge", "Multi-document Transaction Secure")}</span>
           </div>
           <span>•</span>
-          <span>Currency: BDT (৳)</span>
+          <span>{t("login.currencyBadge", "Currency: BDT (৳)")}</span>
         </div>
       </div>
     </div>

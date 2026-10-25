@@ -5,6 +5,7 @@ import { apiClient } from "@/lib/api-client";
 import { formatBDT } from "@/lib/money";
 import { authClient } from "@/lib/auth-client";
 import ImagePicker from "@/components/ImagePicker";
+import { useLanguage } from "@/context/LanguageContext";
 import {
   Package,
   Plus,
@@ -24,6 +25,7 @@ export default function ProductsPage() {
   const [categoryFilter, setCategoryFilter] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState(null);
+  const { t, isBengali, toBengaliDigits } = useLanguage();
 
   // New Product Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -38,6 +40,8 @@ export default function ProductsPage() {
   });
   const [formError, setFormError] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+
+  const num = (n) => (isBengali ? toBengaliDigits(n) : n);
 
   const fetchSession = async () => {
     try {
@@ -88,7 +92,7 @@ export default function ProductsPage() {
 
     const priceBDT = parseFloat(formData.sellingPriceBDT);
     if (isNaN(priceBDT) || priceBDT < 0) {
-      setFormError("Please enter a valid price in BDT.");
+      setFormError(isBengali ? "অনুগ্রহ করে সঠিক টাকা পরিমাণ লিখুন।" : "Please enter a valid price in BDT.");
       return;
     }
 
@@ -98,7 +102,7 @@ export default function ProductsPage() {
         name: formData.name.trim(),
         sku: formData.sku.trim().toUpperCase(),
         category: formData.category.trim(),
-        sellingPrice: Math.round(priceBDT * 100), // convert to minor units
+        sellingPrice: Math.round(priceBDT * 100),
         stockQuantity: parseInt(formData.stockQuantity, 10) || 0,
         lowStockThreshold: parseInt(formData.lowStockThreshold, 10) || 10,
         imageUrl: formData.imageUrl ? formData.imageUrl.trim() : null,
@@ -124,7 +128,7 @@ export default function ProductsPage() {
         fetchProducts(1);
       }
     } catch (err) {
-      setFormError(err.message || "Failed to create product.");
+      setFormError(err.message || (isBengali ? "পণ্য সংরক্ষণ ব্যর্থ হয়েছে।" : "Failed to create product."));
     } finally {
       setIsSaving(false);
     }
@@ -137,9 +141,11 @@ export default function ProductsPage() {
       {/* Top Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white sm:text-3xl">Product Catalog</h1>
+          <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white sm:text-3xl">
+            {t("products.title", "Product Catalog")}
+          </h1>
           <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-            Manage your store's inventory, prices, and low-stock alerts.
+            {t("products.subtitle", "Manage your store's inventory, prices, and low-stock alerts.")}
           </p>
         </div>
 
@@ -149,7 +155,7 @@ export default function ProductsPage() {
             className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-brand-600 to-indigo-600 px-5 py-3 text-xs font-bold text-white shadow-lg shadow-brand-500/25 transition-all hover:brightness-110 active:scale-95"
           >
             <Plus className="h-4 w-4" />
-            <span>Add New Product</span>
+            <span>{t("products.addNew", "Add New Product")}</span>
           </button>
         )}
       </div>
@@ -163,7 +169,7 @@ export default function ProductsPage() {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by product name, SKU, or category..."
+              placeholder={t("products.searchPlaceholder", "Search by product name, SKU, or category...")}
               className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 py-2.5 pl-10 pr-4 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-brand-500 focus:outline-none shadow-sm"
             />
           </div>
@@ -172,7 +178,7 @@ export default function ProductsPage() {
             type="submit"
             className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 px-5 py-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors shadow-sm"
           >
-            Filter
+            {t("filter", "Filter")}
           </button>
         </form>
       </div>
@@ -183,12 +189,12 @@ export default function ProductsPage() {
           <table className="w-full text-left text-xs">
             <thead className="border-b border-slate-200 dark:border-slate-800/80 bg-slate-100/70 dark:bg-slate-900/60 uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">
               <tr>
-                <th className="py-4 px-6">Product Details</th>
-                <th className="py-4 px-4">SKU</th>
-                <th className="py-4 px-4">Category</th>
-                <th className="py-4 px-4 text-right">Selling Price</th>
-                <th className="py-4 px-4 text-center">Stock Level</th>
-                <th className="py-4 px-6 text-center">Status</th>
+                <th className="py-4 px-6">{t("products.tableDetails", "Product Details")}</th>
+                <th className="py-4 px-4">{t("products.tableSku", "SKU")}</th>
+                <th className="py-4 px-4">{t("products.tableCategory", "Category")}</th>
+                <th className="py-4 px-4 text-right">{t("products.tablePrice", "Selling Price")}</th>
+                <th className="py-4 px-4 text-center">{t("products.tableStock", "Stock Level")}</th>
+                <th className="py-4 px-6 text-center">{t("products.tableStatus", "Status")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
@@ -201,7 +207,7 @@ export default function ProductsPage() {
               ) : products.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="py-12 text-center text-slate-400 dark:text-slate-500">
-                    No products found in the catalog.
+                    {t("products.noProducts", "No products found in the catalog.")}
                   </td>
                 </tr>
               ) : (
@@ -245,15 +251,15 @@ export default function ProductsPage() {
                       <td className="py-4 px-4 text-center">
                         {isOutOfStock ? (
                           <span className="inline-flex rounded-full bg-rose-500/15 px-2.5 py-1 text-[11px] font-bold text-rose-600 dark:text-rose-400">
-                            Out of Stock (0)
+                            {t("products.outOfStockBadge", "Out of Stock (0)")}
                           </span>
                         ) : isLowStock ? (
                           <span className="inline-flex rounded-full bg-amber-500/15 px-2.5 py-1 text-[11px] font-bold text-amber-600 dark:text-amber-400">
-                            Low: {product.stockQuantity} (≤ {product.lowStockThreshold})
+                            {t("products.lowStockBadge", "Low")}: {num(product.stockQuantity)} (≤ {num(product.lowStockThreshold)})
                           </span>
                         ) : (
                           <span className="inline-flex rounded-full bg-emerald-500/15 px-2.5 py-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
-                            {product.stockQuantity} in stock
+                            {num(product.stockQuantity)} {t("products.inStockBadge", "in stock")}
                           </span>
                         )}
                       </td>
@@ -265,7 +271,7 @@ export default function ProductsPage() {
                               : "bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-500"
                           }`}
                         >
-                          {product.isActive ? "Active" : "Inactive"}
+                          {product.isActive ? t("active", "Active") : t("inactive", "Inactive")}
                         </span>
                       </td>
                     </tr>
@@ -280,7 +286,7 @@ export default function ProductsPage() {
         {pagination.totalPages > 1 && (
           <div className="flex items-center justify-between border-t border-slate-200 dark:border-slate-800/80 px-6 py-4 text-xs text-slate-500 dark:text-slate-400">
             <span>
-              Showing Page {pagination.page} of {pagination.totalPages} ({pagination.total} total)
+              {t("page", "Page")} {num(pagination.page)} {t("of", "of")} {num(pagination.totalPages)} ({num(pagination.total)} {t("total", "total")})
             </span>
             <div className="flex items-center gap-2">
               <button
@@ -288,14 +294,14 @@ export default function ProductsPage() {
                 onClick={() => fetchProducts(pagination.page - 1)}
                 className="rounded-lg border border-slate-200 dark:border-slate-800 px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-40"
               >
-                Previous
+                {t("previous", "Previous")}
               </button>
               <button
                 disabled={pagination.page >= pagination.totalPages}
                 onClick={() => fetchProducts(pagination.page + 1)}
                 className="rounded-lg border border-slate-200 dark:border-slate-800 px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-40"
               >
-                Next
+                {t("next", "Next")}
               </button>
             </div>
           </div>
@@ -311,7 +317,9 @@ export default function ProductsPage() {
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-500/15 text-brand-600 dark:text-brand-400">
                   <Package className="h-5 w-5" />
                 </div>
-                <h2 className="text-base font-bold text-slate-900 dark:text-white">Create New Product</h2>
+                <h2 className="text-base font-bold text-slate-900 dark:text-white">
+                  {t("products.createTitle", "Create New Product")}
+                </h2>
               </div>
               <button
                 onClick={() => setIsModalOpen(false)}
@@ -336,14 +344,14 @@ export default function ProductsPage() {
 
               <div>
                 <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                  Product Name *
+                  {t("products.productName", "Product Name *")}
                 </label>
                 <input
                   type="text"
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="e.g. Pran Mango Juice 250ml"
+                  placeholder={t("products.productNamePlaceholder", "e.g. Pran Mango Juice 250ml")}
                   className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 py-2.5 px-3.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-brand-500 focus:outline-none"
                 />
               </div>
@@ -351,27 +359,27 @@ export default function ProductsPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                    SKU Code *
+                    {t("products.skuCode", "SKU Code *")}
                   </label>
                   <input
                     type="text"
                     required
                     value={formData.sku}
                     onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
-                    placeholder="e.g. BEV-001"
+                    placeholder={t("products.skuPlaceholder", "e.g. BEV-001")}
                     className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 py-2.5 px-3.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 uppercase font-mono focus:border-brand-500 focus:outline-none"
                   />
                 </div>
 
                 <div>
                   <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                    Category
+                    {t("products.categoryLabel", "Category")}
                   </label>
                   <input
                     type="text"
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    placeholder="e.g. Beverages"
+                    placeholder={t("products.categoryPlaceholder", "e.g. Beverages")}
                     className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 py-2.5 px-3.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-brand-500 focus:outline-none"
                   />
                 </div>
@@ -380,7 +388,7 @@ export default function ProductsPage() {
               <div className="grid grid-cols-3 gap-3">
                 <div>
                   <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                    Price (৳ BDT) *
+                    {t("products.priceLabel", "Price (৳ BDT) *")}
                   </label>
                   <input
                     type="number"
@@ -395,7 +403,7 @@ export default function ProductsPage() {
 
                 <div>
                   <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                    Initial Stock
+                    {t("products.initialStock", "Initial Stock")}
                   </label>
                   <input
                     type="number"
@@ -408,7 +416,7 @@ export default function ProductsPage() {
 
                 <div>
                   <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                    Low Stock Alert
+                    {t("products.lowStockAlert", "Low Stock Alert")}
                   </label>
                   <input
                     type="number"
@@ -428,14 +436,14 @@ export default function ProductsPage() {
                   onClick={() => setIsModalOpen(false)}
                   className="rounded-xl border border-slate-200 dark:border-slate-800 px-4 py-2.5 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                 >
-                  Cancel
+                  {t("cancel", "Cancel")}
                 </button>
                 <button
                   type="submit"
                   disabled={isSaving}
                   className="rounded-xl bg-brand-600 px-5 py-2.5 text-xs font-bold text-white hover:bg-brand-500 transition-colors shadow-lg shadow-brand-500/25 disabled:opacity-60"
                 >
-                  {isSaving ? "Saving..." : "Create Product"}
+                  {isSaving ? t("products.creatingButton", "Saving...") : t("products.createButton", "Create Product")}
                 </button>
               </div>
             </form>

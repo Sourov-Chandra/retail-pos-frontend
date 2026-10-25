@@ -3,6 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { apiClient } from "@/lib/api-client";
 import { formatBDT } from "@/lib/money";
+import { useLanguage } from "@/context/LanguageContext";
 import {
   Search,
   ShoppingCart,
@@ -26,6 +27,7 @@ export default function POSTerminalPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("ALL");
+  const { t, isBengali, toBengaliDigits } = useLanguage();
 
   // Cart state
   const [cart, setCart] = useState([]);
@@ -55,6 +57,8 @@ export default function POSTerminalPage() {
   useEffect(() => {
     loadProducts();
   }, []);
+
+  const num = (n) => (isBengali ? toBengaliDigits(n) : n);
 
   // Unique categories list
   const categories = useMemo(() => {
@@ -166,7 +170,7 @@ export default function POSTerminalPage() {
       if (res.success) {
         setCompletedSale(res.sale);
         clearCart();
-        loadProducts(); // Refresh stock counts in real time
+        loadProducts();
       }
     } catch (err) {
       setCheckoutError(err.message || "Failed to process sale checkout.");
@@ -187,7 +191,7 @@ export default function POSTerminalPage() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search products by name, SKU, or category..."
+              placeholder={t("pos.searchPlaceholder", "Search products by name, SKU, or category...")}
               className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 py-3.5 pl-12 pr-4 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-brand-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-4 focus:ring-brand-500/10 shadow-sm"
             />
           </div>
@@ -204,7 +208,7 @@ export default function POSTerminalPage() {
                     : "border border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900 dark:border-slate-800 dark:bg-slate-900/40 dark:text-slate-400 dark:hover:border-slate-700 dark:hover:text-slate-200"
                 }`}
               >
-                {cat}
+                {cat === "ALL" ? t("all", "ALL") : cat}
               </button>
             ))}
           </div>
@@ -221,8 +225,10 @@ export default function POSTerminalPage() {
           ) : filteredProducts.length === 0 ? (
             <div className="flex h-64 flex-col items-center justify-center text-center">
               <Package className="h-10 w-10 text-slate-400 dark:text-slate-600 mb-2" />
-              <p className="text-sm font-semibold text-slate-600 dark:text-slate-400">No products found</p>
-              <p className="text-xs text-slate-500">Try adjusting your search or category filter.</p>
+              <p className="text-sm font-semibold text-slate-600 dark:text-slate-400">
+                {t("pos.noProductsFound", "No products found")}
+              </p>
+              <p className="text-xs text-slate-500">{t("pos.adjustFilter", "Try adjusting your search or category filter.")}</p>
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4">
@@ -264,15 +270,15 @@ export default function POSTerminalPage() {
                         <div className="absolute top-2 right-2">
                           {isOutOfStock ? (
                             <span className="rounded-full bg-rose-500/90 px-2 py-0.5 text-[10px] font-bold text-white shadow-sm">
-                              Out
+                              {t("pos.outOfStock", "Out")}
                             </span>
                           ) : isLowStock ? (
                             <span className="rounded-full bg-amber-500/90 px-2 py-0.5 text-[10px] font-bold text-slate-950 shadow-sm animate-pulse">
-                              {product.stockQuantity} left
+                              {num(product.stockQuantity)} {t("pos.left", "left")}
                             </span>
                           ) : (
                             <span className="rounded-full bg-emerald-500/90 px-2 py-0.5 text-[10px] font-bold text-white shadow-sm">
-                              {product.stockQuantity}
+                              {num(product.stockQuantity)}
                             </span>
                           )}
                         </div>
@@ -309,18 +315,18 @@ export default function POSTerminalPage() {
               <ShoppingCart className="h-5 w-5" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-slate-900 dark:text-white">Current Cart</h2>
+              <h2 className="text-base font-bold text-slate-900 dark:text-white">{t("pos.currentCart", "Current Cart")}</h2>
               <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                {cart.reduce((a, c) => a + c.quantity, 0)} items selected
+                {num(cart.reduce((a, c) => a + c.quantity, 0))} {t("pos.itemsSelected", "items selected")}
               </span>
             </div>
           </div>
           {cart.length > 0 && (
             <button
               onClick={clearCart}
-              className="rounded-lg p-1.5 text-xs text-slate-500 transition-colors hover:bg-rose-500/10 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400"
+              className="rounded-lg p-1.5 text-xs text-slate-500 transition-colors hover:bg-rose-500/10 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 font-semibold"
             >
-              Clear Cart
+              {t("pos.clearCart", "Clear Cart")}
             </button>
           )}
         </div>
@@ -338,8 +344,8 @@ export default function POSTerminalPage() {
           {cart.length === 0 ? (
             <div className="flex h-48 flex-col items-center justify-center text-center">
               <ShoppingCart className="h-10 w-10 text-slate-300 dark:text-slate-700 mb-2" />
-              <p className="text-sm font-semibold text-slate-600 dark:text-slate-400">Your cart is empty</p>
-              <p className="text-xs text-slate-400 dark:text-slate-500">Tap items on the left to add them to register.</p>
+              <p className="text-sm font-semibold text-slate-600 dark:text-slate-400">{t("pos.cartEmpty", "Your cart is empty")}</p>
+              <p className="text-xs text-slate-400 dark:text-slate-500">{t("pos.cartEmptySub", "Tap items on the left to add them to register.")}</p>
             </div>
           ) : (
             cart.map(({ product, quantity }) => (
@@ -350,7 +356,7 @@ export default function POSTerminalPage() {
                 <div className="flex-1 pr-3">
                   <p className="text-xs font-bold text-slate-900 dark:text-white line-clamp-1">{product.name}</p>
                   <p className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
-                    {formatBDT(product.sellingPrice)} × {quantity}
+                    {formatBDT(product.sellingPrice)} × {num(quantity)}
                   </p>
                 </div>
 
@@ -363,7 +369,7 @@ export default function POSTerminalPage() {
                       <Minus className="h-3 w-3" />
                     </button>
                     <span className="w-6 text-center text-xs font-bold text-slate-900 dark:text-white font-mono">
-                      {quantity}
+                      {num(quantity)}
                     </span>
                     <button
                       onClick={() => updateQuantity(product._id, 1)}
@@ -397,7 +403,7 @@ export default function POSTerminalPage() {
             <div className="flex items-center justify-between text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2">
               <span className="flex items-center gap-1.5">
                 <Tag className="h-3.5 w-3.5 text-brand-500" />
-                <span>Apply Discount</span>
+                <span>{t("pos.applyDiscount", "Apply Discount")}</span>
               </span>
               <div className="flex rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-0.5 text-[10px]">
                 <button
@@ -405,7 +411,7 @@ export default function POSTerminalPage() {
                   onClick={() => setDiscountType("none")}
                   className={`px-2 py-0.5 rounded ${discountType === "none" ? "bg-brand-600 text-white font-bold" : "text-slate-500 dark:text-slate-400"}`}
                 >
-                  None
+                  {t("pos.discountNone", "None")}
                 </button>
                 <button
                   type="button"
@@ -432,7 +438,7 @@ export default function POSTerminalPage() {
                   max={discountType === "percentage" ? "100" : undefined}
                   value={discountValue}
                   onChange={(e) => setDiscountValue(e.target.value)}
-                  placeholder={discountType === "percentage" ? "Enter % (e.g. 10)" : "Enter ৳ amount"}
+                  placeholder={discountType === "percentage" ? t("pos.enterPercentage", "Enter % (e.g. 10)") : t("pos.enterAmount", "Enter ৳ amount")}
                   className="w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 py-1.5 px-3 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-brand-500 focus:outline-none"
                 />
               </div>
@@ -442,13 +448,13 @@ export default function POSTerminalPage() {
           {/* Payment Method Selector */}
           <div>
             <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-              Payment Method
+              {t("pos.paymentMethod", "Payment Method")}
             </label>
             <div className="grid grid-cols-3 gap-2">
               {[
-                { id: "cash", label: "Cash", icon: Banknote },
-                { id: "card", label: "Card", icon: CreditCard },
-                { id: "mobile_payment", label: "Mobile Pay", icon: Smartphone },
+                { id: "cash", label: t("pos.cash", "Cash"), icon: Banknote },
+                { id: "card", label: t("pos.card", "Card"), icon: CreditCard },
+                { id: "mobile_payment", label: t("pos.mobilePay", "Mobile Pay"), icon: Smartphone },
               ].map(({ id, label, icon: Icon }) => (
                 <button
                   key={id}
@@ -470,17 +476,17 @@ export default function POSTerminalPage() {
           {/* Price Totals */}
           <div className="space-y-1.5 text-xs border-t border-slate-200 dark:border-slate-800/60 pt-3">
             <div className="flex justify-between text-slate-500 dark:text-slate-400">
-              <span>Subtotal</span>
+              <span>{t("pos.subtotal", "Subtotal")}</span>
               <span className="font-mono text-slate-800 dark:text-slate-200">{formatBDT(subtotal)}</span>
             </div>
             {discountAmount > 0 && (
               <div className="flex justify-between text-amber-600 dark:text-amber-400">
-                <span>Discount Deduction</span>
+                <span>{t("pos.discountDeduction", "Discount Deduction")}</span>
                 <span className="font-mono">- {formatBDT(discountAmount)}</span>
               </div>
             )}
             <div className="flex justify-between items-baseline pt-2 border-t border-slate-200 dark:border-slate-800 text-sm font-bold">
-              <span className="text-slate-900 dark:text-white">Final Total</span>
+              <span className="text-slate-900 dark:text-white">{t("pos.finalTotal", "Final Total")}</span>
               <span className="text-xl font-black text-emerald-600 dark:text-emerald-400 font-mono">
                 {formatBDT(finalTotal)}
               </span>
@@ -499,7 +505,7 @@ export default function POSTerminalPage() {
             ) : (
               <>
                 <Sparkles className="h-4 w-4" />
-                <span>Complete Checkout • {formatBDT(finalTotal)}</span>
+                <span>{t("pos.completeCheckout", "Complete Checkout")} • {formatBDT(finalTotal)}</span>
               </>
             )}
           </button>
@@ -514,7 +520,7 @@ export default function POSTerminalPage() {
             <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
               <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
                 <CheckCircle className="h-5 w-5" />
-                <span className="text-sm font-bold">Payment Confirmed</span>
+                <span className="text-sm font-bold">{t("pos.paymentConfirmed", "Payment Confirmed")}</span>
               </div>
               <button
                 onClick={() => setCompletedSale(null)}
@@ -530,26 +536,26 @@ export default function POSTerminalPage() {
               className="my-4 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 bg-white p-5 text-black font-mono text-xs shadow-inner"
             >
               <div className="text-center pb-3 border-b border-dashed border-neutral-400">
-                <h2 className="text-base font-black tracking-wider uppercase">RETAIL POS BANGLADESH</h2>
-                <p className="text-[10px] text-neutral-600">Smart Retail Management</p>
-                <p className="mt-1 text-[10px] text-neutral-500">Dhaka, Bangladesh</p>
+                <h2 className="text-base font-black tracking-wider uppercase">{t("pos.receiptTitle", "RETAIL POS BANGLADESH")}</h2>
+                <p className="text-[10px] text-neutral-600">{t("pos.receiptSubtitle", "Smart Retail Management")}</p>
+                <p className="mt-1 text-[10px] text-neutral-500">{t("pos.city", "Dhaka, Bangladesh")}</p>
               </div>
 
               <div className="py-2.5 border-b border-dashed border-neutral-400 space-y-1 text-[11px]">
                 <div className="flex justify-between">
-                  <span className="text-neutral-600">Receipt #:</span>
+                  <span className="text-neutral-600">{t("pos.receiptNo", "Receipt #:")}</span>
                   <span className="font-bold">{completedSale.saleNumber}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-neutral-600">Date:</span>
+                  <span className="text-neutral-600">{t("pos.date", "Date:")}</span>
                   <span>{new Date(completedSale.createdAt).toLocaleDateString()}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-neutral-600">Cashier:</span>
+                  <span className="text-neutral-600">{t("pos.cashierLabel", "Cashier:")}</span>
                   <span>{completedSale.cashierName}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-neutral-600">Payment:</span>
+                  <span className="text-neutral-600">{t("pos.paymentLabel", "Payment:")}</span>
                   <span className="uppercase font-bold">{completedSale.paymentMethod}</span>
                 </div>
               </div>
@@ -561,7 +567,7 @@ export default function POSTerminalPage() {
                     <div className="pr-2">
                       <p className="font-bold">{item.productName}</p>
                       <p className="text-[10px] text-neutral-600">
-                        {item.quantity} × {formatBDT(item.unitPrice)}
+                        {num(item.quantity)} × {formatBDT(item.unitPrice)}
                       </p>
                     </div>
                     <span className="font-bold font-mono">{formatBDT(item.lineTotal)}</span>
@@ -572,25 +578,25 @@ export default function POSTerminalPage() {
               {/* Totals */}
               <div className="pt-3 space-y-1 text-[11px]">
                 <div className="flex justify-between">
-                  <span className="text-neutral-600">Subtotal:</span>
+                  <span className="text-neutral-600">{t("pos.subtotal", "Subtotal")}:</span>
                   <span>{formatBDT(completedSale.subtotal)}</span>
                 </div>
                 {completedSale.discount?.amount > 0 && (
                   <div className="flex justify-between text-neutral-700">
-                    <span>Discount:</span>
+                    <span>{t("pos.discountDeduction", "Discount")}:</span>
                     <span>- {formatBDT(completedSale.discount.amount)}</span>
                   </div>
                 )}
                 <div className="flex justify-between text-sm font-black pt-1 border-t border-dashed border-neutral-400">
-                  <span>TOTAL PAID:</span>
+                  <span>{t("pos.totalPaid", "TOTAL PAID:")}</span>
                   <span>{formatBDT(completedSale.totalAmount)}</span>
                 </div>
               </div>
 
               {/* Footer */}
               <div className="mt-4 pt-3 border-t border-dashed border-neutral-400 text-center">
-                <p className="text-[10px] uppercase font-bold text-neutral-700">*** THANK YOU FOR SHOPPING ***</p>
-                <p className="text-[9px] text-neutral-500 mt-0.5">Please retain this receipt for warranty</p>
+                <p className="text-[10px] uppercase font-bold text-neutral-700">{t("pos.thankYou", "*** THANK YOU FOR SHOPPING ***")}</p>
+                <p className="text-[9px] text-neutral-500 mt-0.5">{t("pos.warrantyNote", "Please retain this receipt for warranty")}</p>
               </div>
             </div>
 
@@ -598,16 +604,16 @@ export default function POSTerminalPage() {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => window.print()}
-                className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 py-3 text-xs font-semibold text-slate-800 dark:text-white hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 py-3 text-xs font-semibold text-slate-800 dark:text-white hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors shadow-sm"
               >
                 <Printer className="h-4 w-4" />
-                <span>Print Receipt</span>
+                <span>{t("pos.printReceipt", "Print Receipt")}</span>
               </button>
               <button
                 onClick={() => setCompletedSale(null)}
                 className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-brand-600 py-3 text-xs font-bold text-white hover:bg-brand-500 transition-colors shadow-lg shadow-brand-500/25"
               >
-                <span>New Sale</span>
+                <span>{t("pos.newSale", "New Sale")}</span>
               </button>
             </div>
           </div>
