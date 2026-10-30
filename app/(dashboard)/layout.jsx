@@ -20,6 +20,7 @@ import {
   Menu,
   X,
   CreditCard,
+  Users,
 } from "lucide-react";
 
 export default function DashboardLayout({ children }) {
@@ -56,6 +57,12 @@ export default function DashboardLayout({ children }) {
       name: t("nav.inventory", "Inventory & Audit"),
       href: "/inventory",
       icon: Boxes,
+    },
+    {
+      name: t("nav.staff", "Staff & Cashiers"),
+      href: "/staff",
+      icon: Users,
+      ownerOnly: true,
     },
   ];
 
@@ -125,6 +132,7 @@ export default function DashboardLayout({ children }) {
     if (pathname.startsWith("/products")) return t("nav.products", "Products");
     if (pathname.startsWith("/sales")) return t("nav.sales", "Sales History");
     if (pathname.startsWith("/inventory")) return t("nav.inventory", "Inventory & Audit");
+    if (pathname.startsWith("/staff")) return t("nav.staff", "Staff & Cashiers");
     return t("appName", "Dokandari");
   };
 
@@ -178,7 +186,7 @@ export default function DashboardLayout({ children }) {
           <div className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
             {t("operations", "Operations")}
           </div>
-          {NAV_ITEMS.map((item) => {
+          {NAV_ITEMS.filter((item) => !item.ownerOnly || isOwner).map((item) => {
             const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
             const Icon = item.icon;
             return (
