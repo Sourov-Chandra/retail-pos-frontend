@@ -250,17 +250,16 @@ export default function POSTerminalPage() {
                     <div>
                       {/* Product Image Thumbnail */}
                       <div className="relative mb-3 aspect-[4/3] w-full overflow-hidden rounded-xl bg-slate-100 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 flex items-center justify-center">
-                        {product.imageUrl ? (
+                        <Package className="h-8 w-8 text-slate-400 dark:text-slate-700" />
+                        {product.imageUrl && (
                           <img
                             src={product.imageUrl}
                             alt={product.name}
-                            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                            className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                             onError={(e) => {
-                              e.target.style.display = "none";
+                              e.currentTarget.style.display = "none";
                             }}
                           />
-                        ) : (
-                          <Package className="h-8 w-8 text-slate-400 dark:text-slate-700" />
                         )}
                         <div className="absolute top-2 left-2">
                           <span className="rounded-md bg-white/90 dark:bg-slate-950/85 backdrop-blur-md px-2 py-0.5 text-[10px] font-semibold text-slate-700 dark:text-slate-300 font-mono shadow-sm">

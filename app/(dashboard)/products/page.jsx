@@ -220,18 +220,17 @@ export default function ProductsPage() {
                     <tr key={product._id} className="hover:bg-slate-50/80 dark:hover:bg-slate-900/40 transition-colors">
                       <td className="py-4 px-6 font-bold text-slate-900 dark:text-white">
                         <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 shrink-0 overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 flex items-center justify-center">
-                            {product.imageUrl ? (
+                          <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 flex items-center justify-center">
+                            <Package className="h-5 w-5 text-slate-400 dark:text-slate-600" />
+                            {product.imageUrl && (
                               <img
                                 src={product.imageUrl}
                                 alt={product.name}
-                                className="h-full w-full object-cover"
+                                className="absolute inset-0 h-full w-full object-cover"
                                 onError={(e) => {
-                                  e.target.style.display = "none";
+                                  e.currentTarget.style.display = "none";
                                 }}
                               />
-                            ) : (
-                              <Package className="h-5 w-5 text-slate-400 dark:text-slate-600" />
                             )}
                           </div>
                           <div>
